@@ -22,7 +22,7 @@ class _OrderDetailsState extends State<OrderDetails>{
    double lat;
    double lag;
    bool locationCollected = false;
-  Future<Position> getLocation() async {
+    Future<Position> getLocation() async {
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low).then((value) {
       lat = value.latitude;
       lag = value.longitude;
@@ -33,7 +33,6 @@ class _OrderDetailsState extends State<OrderDetails>{
 
     return position;
   }
-
 
   bool isLoading=true;
   String token = Cachehelper.getData(key: "token");
@@ -102,7 +101,7 @@ class _OrderDetailsState extends State<OrderDetails>{
               children: <Widget>[
                  locationCollected?WebView(
                   key: _key,
-                  initialUrl:"https://driverapp.canariapp.com/orders/${widget.order_ref}?token=${token}&lat=${lat}&lng=${lag}",
+                  initialUrl:"https://www.couriers.canariapp.com/orders/${widget.order_ref}?token=${token}&lat=${lat}&lng=${lag}",
                   zoomEnabled: false,
                   javascriptMode: JavascriptMode.unrestricted,
                   javascriptChannels:<JavascriptChannel>{

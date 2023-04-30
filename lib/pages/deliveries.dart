@@ -81,7 +81,7 @@ class _DeliveriesState extends State<Deliveries> {
                 });
               },
             ),
-            isLoading ?LinearProgressIndicator(color: Colors.red,backgroundColor:Color(0xFFFFCDD2))
+            isLoading ?Center(child: CircularProgressIndicator(color: Colors.red,backgroundColor:Color(0xFFFFCDD2)))
                 : Stack(),
           ],
         ),

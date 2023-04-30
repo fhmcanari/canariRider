@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:riderapp/pages/reports.dart';
 import 'package:riderapp/pages/shifts.dart';
@@ -37,7 +39,7 @@ class _HomeLayoutState extends State<HomeLayout> {
   }
 
 
-   StreamSubscription<Position> ps;
+
   Future<bool> _handleLocationPermission() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -60,24 +62,17 @@ class _HomeLayoutState extends State<HomeLayout> {
     }
     return true;
   }
-  // Future<void> getCurrentPosition() async {
-  //   final hasPermission = await _handleLocationPermission();
-  //   if (!hasPermission) return;
-  //   await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-  //       .then((Position position) {
-  //
-  //   }).catchError((e) {
-  //     debugPrint(e);
-  //   });
-  // }
-  var fbm = FirebaseMessaging.instance;
-  AudioPlayer advancedPlayer;
-  AudioCache audioCache;
 
-  void initPlayer() {
-    advancedPlayer = new AudioPlayer();
-    audioCache = new AudioCache(fixedPlayer: advancedPlayer);
-  }
+  var fbm = FirebaseMessaging.instance;
+
+
+
+
+
+
+
+
+
 
 
   @override
@@ -89,16 +84,19 @@ class _HomeLayoutState extends State<HomeLayout> {
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
     FirebaseMessaging.onMessage.listen((message){
-      // showLocalNotification('Yay you did it!','Congrats on your first local notification');
 
       if (message.notification.body!=null){
+
         Map<String, dynamic> jsonMap = jsonDecode(message.notification.body);
+        print(jsonMap);
+
         final order_ref = jsonMap['order_ref'];
         final distance = jsonMap['distance'];
+        final delivery_time = jsonMap['duration'];
         final delivery_price = jsonMap['delivery_price'];
         final name = jsonMap['store']['name'];
         final address = jsonMap['store']['address'];
-        final destination = jsonMap['destination']['label'];
+        final destination =jsonMap['destination']!=null? jsonMap['destination']['label']:null;
 
         showModalBottomSheet(
             enableDrag: false,
@@ -109,6 +107,7 @@ class _HomeLayoutState extends State<HomeLayout> {
             name: name,
             distance: distance,
             delivery_price: delivery_price,
+            delivery_time: delivery_time,
             address: address,
             destination: destination,
           );
@@ -117,16 +116,20 @@ class _HomeLayoutState extends State<HomeLayout> {
     },);
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      // showLocalNotification('Yay you did it!','Congrats on your first local notification');
-      print(message.notification.body);
       if (message.notification.body!=null){
         Map<String, dynamic> jsonMap = jsonDecode(message.notification.body);
+        print(jsonMap);
+
         final order_ref = jsonMap['order_ref'];
         final distance = jsonMap['distance'];
+        final delivery_time = jsonMap['duration'];
         final delivery_price = jsonMap['delivery_price'];
         final name = jsonMap['store']['name'];
         final address = jsonMap['store']['address'];
-        final destination = jsonMap['destination']['label'];
+        final destination =jsonMap['destination']!=null? jsonMap['destination']['label']:null;
+
+        // {notification_type:NEW_ORDER,order_ref: A-2987,delivery_price: 10.00,
+        //  store:{name: Valhalla,address: 5Q2X+52V، العيون 70000},destination:null}
 
         showModalBottomSheet(
             enableDrag: false,
@@ -137,6 +140,7 @@ class _HomeLayoutState extends State<HomeLayout> {
             name: name,
             distance: distance,
             delivery_price: delivery_price,
+            delivery_time: delivery_time,
             address: address,
             destination: destination,
           );
@@ -144,7 +148,6 @@ class _HomeLayoutState extends State<HomeLayout> {
       }
     });
 
-    initPlayer();
     fbm.getToken();
     super.initState();
   }
@@ -154,8 +157,6 @@ class _HomeLayoutState extends State<HomeLayout> {
     Deliveries(),
     Shifts(),
     Reports(),
-
-
   ];
 
   @override
